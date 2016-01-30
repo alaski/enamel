@@ -47,7 +47,12 @@ def home():
 
 
 def server_boot():
+    # TODO(alaski): Rather than reimplenting this in every method it should be
+    # moved into a decorator or central location.
+    if flask.request.content_type != 'application/json':
+        flask.abort(415)
+    # This raises BadRequest if no data is provided with the POST.
     data = flask.request.get_json()
     # TODO(cdent): Call the task workflow here and return a link to the task
     task_return = data
-    return flask.jsonify(task_return)
+    return flask.make_response(flask.jsonify(task_return), 202)

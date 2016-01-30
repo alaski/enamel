@@ -15,6 +15,7 @@ tests:
       data:
           type: the awesome kind
           name: super cool
+      status: 202
       response_headers:
           content-type: application/json
       response_json_paths:

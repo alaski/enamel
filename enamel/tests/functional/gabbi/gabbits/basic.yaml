@@ -21,3 +21,31 @@ tests:
           # this is made up and not expected to be correct
           $.resources['http://docs.openstack.org/api/openstack/1/rel/servers'].href: /servers
           $.resources['http://docs.openstack.org/api/openstack/1/rel/server'].href_template: /servers/{server_id}
+
+    - name: server boot wrong content type
+      POST: /servers
+      data:
+          foo: bar
+      request_headers:
+          content-type: application/xml
+      status: 415
+      response_headers:
+          content-type: application/json
+
+    - name: server boot pass back data
+      POST: /servers
+      data:
+          foo: bar
+      request_headers:
+          content-type: application/json
+      status: 202
+      response_headers:
+          content-type: application/json
+
+    - name: server boot no post data
+      POST: /servers
+      request_headers:
+          content-type: application/json
+      status: 400
+      response_headers:
+          content-type: application/json

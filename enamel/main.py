@@ -17,6 +17,7 @@ import flask
 from keystonemiddleware import auth_token
 from oslo_config import cfg
 from oslo_log import log as logging
+from werkzeug import exceptions
 
 from enamel.api import handlers
 from enamel import opts
@@ -39,6 +40,19 @@ def create_app(conf):
             'oslo_config_config': conf,
         }
         app.wsgi_app = auth_token.AuthProtocol(app.wsgi_app, auth_conf)
+
+    def make_json_error(exc):
+        # This causes the content-type to be application/json
+        response = flask.jsonify(message=str(exc))
+        response.status_code = (exc.code if
+                                isinstance(exc, exceptions.HTTPException) else
+                                500)
+        return response
+
+    for status_code in exceptions.default_exceptions.keys():
+        # The first dimension in the dict is the blueprint this should apply
+        # to.  None indicates all of them.
+        app.error_handler_spec[None][status_code] = make_json_error
     return app
 
 
